@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>QCM en direct — Mésothéliome &amp; amiante</title>
+<style>
+:root{
+  --navy:#0f2440;--navy2:#1b3557;--navy3:#2a4a73;--sage:#5f8f76;--sage2:#7fa892;--sage-soft:#e5efe9;
+  --bg:#f2f4f7;--card:#fff;--line:#dde3ea;--ink:#14233a;--muted:#5b697c;
+  --ok:#24804f;--ok-soft:#e1f3e8;--bad:#b73a2e;--bad-soft:#fbe8e5;--warn:#b7791f;--warn-soft:#fbf1df;--info-soft:#e4eef9;
+  --r:14px;--shadow:0 1px 2px rgba(15,36,64,.06),0 8px 24px -14px rgba(15,36,64,.25);
+  --font:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;--mono:ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.hidden{display:none!important}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+.top{background:var(--navy);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.top b{font-size:.95rem}
+.top .sp{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:.82rem}
+.pill{background:var(--navy2);border-radius:999px;padding:5px 11px;white-space:nowrap}
+.pill b{color:#9fe0bb}
+.eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--sage)}
+h1{font-size:1.5rem;line-height:1.2;margin:4px 0 10px}
+h2{font-size:1.2rem;margin:4px 0 8px}
+.muted{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:.95rem;padding:12px 18px;border-radius:11px;border:1px solid var(--line);background:var(--card);transition:.15s}
+.btn:hover{border-color:var(--sage)}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:var(--navy3)}
+.btn.sage{background:var(--sage);border-color:var(--sage);color:#fff}
+.btn.danger{color:var(--bad)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input[type=text],input[type=password]{width:100%;padding:13px 14px;border-radius:11px;border:1.5px solid var(--line);background:var(--card);font-size:1rem}
+input:focus{outline:none;border-color:var(--sage)}
+.center{min-height:calc(100vh - 60px);display:grid;place-items:center;padding:20px}
+.center .card{width:min(440px,100%)}
+.stack{display:grid;gap:12px}
+.ctx{font-size:.88rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:9px 12px;margin:8px 0 12px}
+.callout{border-left:4px solid var(--sage);background:var(--sage-soft);padding:10px 13px;border-radius:0 10px 10px 0;font-size:.92rem;margin:10px 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.callout.bad{border-color:var(--bad);background:var(--bad-soft)}
+.spinner{width:40px;height:40px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--sage);animation:spin 1s linear infinite;margin:6px auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* options (étudiant) */
+.opts{display:grid;gap:9px}
+.opt{display:grid;grid-template-columns:34px 1fr 24px;gap:12px;align-items:start;width:100%;text-align:left;padding:13px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-size:.95rem;line-height:1.45}
+.ltr{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;border:1.5px solid var(--line);color:var(--muted)}
+.opt.sel{border-color:var(--navy3);background:var(--info-soft)}
+.opt.sel .ltr{background:var(--navy3);border-color:var(--navy3);color:#fff}
+.opt .mk{font-weight:800;text-align:center}
+.opt.good{border-color:var(--ok);background:var(--ok-soft)}.opt.good .ltr{background:var(--ok);border-color:var(--ok);color:#fff}.opt.good .mk{color:var(--ok)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}.opt.bad .ltr{background:var(--bad);border-color:var(--bad);color:#fff}.opt.bad .mk{color:var(--bad)}
+.opt.miss{border-style:dashed;border-color:var(--ok)}.opt.miss .ltr{color:var(--ok);border-color:var(--ok)}.opt.miss .mk{color:var(--ok)}
+.opt.neutral{opacity:.65}
+.opt .why{grid-column:2/4;font-size:.84rem;color:var(--muted)}
+.sentbar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:16px 0 6px}
+.status{text-align:center;font-weight:700;font-size:.9rem;margin-top:8px}
+.status.ok{color:var(--ok)}
+
+/* ===== ÉCRAN ENSEIGNANT (projection) ===== */
+body.prof{background:#0b1625;color:#e6edf6}
+body.prof .card{background:#12223a;border-color:#223754;box-shadow:none}
+body.prof .muted{color:#9db0c7}
+body.prof .ctx{background:#0e1b2e;color:#b8c7d9}
+body.prof .btn{background:#12223a;border-color:#2b4566;color:#e6edf6}
+body.prof .btn.primary{background:var(--sage);border-color:var(--sage)}
+body.prof .btn.sage{background:#2d6fb0;border-color:#2d6fb0}
+body.prof .btn.danger{color:#f08b80}
+body.prof .callout{background:#16302a;color:#d4e8dc}
+body.prof .callout.warn{background:#352812;color:#f3dfb7}
+.pwrap{max-width:1500px;margin:0 auto;padding:22px 26px 120px}
+.pgrid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start}
+@media(max-width:1100px){.pgrid{grid-template-columns:1fr}}
+.qtitle{font-size:clamp(1.4rem,2.4vw,2.2rem);line-height:1.15;margin:6px 0 10px;color:#fff}
+.qstem{font-size:clamp(1.05rem,1.4vw,1.3rem);font-weight:600;margin-bottom:6px}
+.bars{display:grid;gap:12px;margin-top:10px}
+.bar{position:relative;border:1.5px solid #2b4566;border-radius:13px;overflow:hidden;background:#0e1b2e}
+.bar .fill{position:absolute;inset:0 auto 0 0;width:0;background:rgba(127,168,146,.28);transition:width .6s cubic-bezier(.2,.7,.2,1)}
+.bar .row{position:relative;display:grid;grid-template-columns:44px 1fr 92px;gap:14px;align-items:center;padding:13px 16px}
+.bar .l{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:1.1rem;border:2px solid #3a5a80}
+.bar .t{font-size:clamp(.95rem,1.15vw,1.12rem);line-height:1.4}
+.bar .pct{text-align:right;font-weight:800;font-size:clamp(1.3rem,2vw,1.9rem);font-variant-numeric:tabular-nums}
+.bar .pct small{display:block;font-size:.72rem;font-weight:600;color:#9db0c7}
+.bar.good{border-color:#5fcf8f}.bar.good .fill{background:rgba(95,207,143,.3)}.bar.good .l{background:#24804f;border-color:#5fcf8f}
+.bar.wrong{border-color:#7a3a35}.bar.wrong .fill{background:rgba(240,139,128,.22)}.bar.wrong .l{border-color:#f08b80;color:#f08b80}
+.bar .why{position:relative;padding:0 16px 13px 74px;font-size:.92rem;color:#c3d1e1}
+.bar .why em{font-style:normal;font-weight:800}
+.blind .bar .fill{width:0!important}.blind .bar .pct{visibility:hidden}
+.side{display:grid;gap:16px}
+.big{font-size:3rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kpi .card{padding:14px}
+.kpi span{font-size:.78rem;color:#9db0c7;display:block;margin-top:4px}
+.ring{height:10px;border-radius:6px;background:#0e1b2e;overflow:hidden;margin-top:10px}
+.ring i{display:block;height:100%;background:var(--sage2);width:0;transition:width .5s}
+.controls{position:fixed;left:0;right:0;bottom:0;background:rgba(11,22,37,.96);border-top:1px solid #223754;padding:12px 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;z-index:20}
+.controls .grow{flex:1}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:.86rem;font-weight:600;cursor:pointer;user-select:none}
+.switch input{appearance:none;width:38px;height:22px;border-radius:999px;background:#2b4566;position:relative;cursor:pointer}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.switch input:checked{background:var(--sage)}.switch input:checked::after{left:19px}
+.lobby{display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:center}
+@media(max-width:900px){.lobby{grid-template-columns:1fr}}
+.qr{background:#fff;padding:14px;border-radius:16px;width:300px;height:300px;display:grid;place-items:center}
+.qr img{width:272px;height:272px}
+.joinurl{font-family:var(--mono);font-size:clamp(1rem,1.6vw,1.4rem);background:#0e1b2e;border:1px solid #2b4566;padding:10px 14px;border-radius:10px;word-break:break-all;color:#9fe0bb}
+.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;max-height:260px;overflow:auto}
+.names span{background:#1b3557;border-radius:999px;padding:5px 12px;font-size:.88rem}
+.lead{counter-reset:r;display:grid;gap:7px}
+.lead li{list-style:none;display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;background:#0e1b2e;border-radius:10px;padding:8px 12px;font-size:1rem}
+.lead li b{font-variant-numeric:tabular-nums}
+.lead li .rk{font-weight:800;color:#9db0c7}
+.lead li:nth-child(1) .rk{color:#f5c542}.lead li:nth-child(2) .rk{color:#d0d6de}.lead li:nth-child(3) .rk{color:#d9955a}
+.qdots{display:flex;gap:6px;flex-wrap:wrap}
+.qdots i{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:.85rem;background:#1b3557;color:#9db0c7}
+.qdots i.cur{background:var(--sage);color:#fff}
+.qdots i.rev{background:#24804f;color:#fff}
+.modal{position:fixed;inset:0;background:rgba(5,12,22,.82);display:grid;place-items:center;z-index:50;padding:20px}
+.modal .card{width:min(720px,100%);max-height:88vh;overflow:auto}
+.demo{position:fixed;left:10px;bottom:10px;z-index:60;background:var(--warn);color:#fff;font-size:.75rem;font-weight:700;padding:5px 10px;border-radius:999px}
+body.prof .demo{bottom:78px}
+</style>
+</head>
+<body>
+
+<!-- ============ CONFIGURATION (à remplir une seule fois) ============ -->
+<script>
+/* 1) Collez ici la configuration de votre projet Firebase
+      (Console Firebase > Paramètres du projet > Vos applications > Web > Config).
+   2) Laissez apiKey vide pour tester en MODE DÉMO : plusieurs onglets du même navigateur. */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCg6AIzshB4A3U1is51fIZzM34Vr-76sOI",
+  authDomain: "qcm-meso.firebaseapp.com",
+  databaseURL: "https://qcm-meso-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "qcm-meso",
+  storageBucket: "qcm-meso.firebasestorage.app",
+  messagingSenderId: "609854527935",
+  appId: "1:609854527935:web:74130f8d37391161f6290a"
+};
+/* Code d'accès de l'écran enseignant (à changer) */
+const PROF_PIN = "2026";
+/* Nom de session par défaut (changeable via ?s=NOM dans le lien) */
+const DEFAULT_SESSION = "meso";
+</script>
+
+<div id="demoBadge" class="demo hidden">MODE DÉMO — local à ce navigateur</div>
+
+<!-- ================= ÉTUDIANT ================= -->
+<div id="student" class="hidden">
+  <div class="top"><b>🫁 QCM en direct</b><div class="sp"><span class="pill" id="sPseudo">—</span><span class="pill" id="sScore">Score <b>0</b></span></div></div>
+
+  <section id="sJoin" class="center"><div class="card stack">
+    <div class="eyebrow">Mésothéliome &amp; amiante</div>
+    <h1>Rejoindre la séance</h1>
+    <p class="muted">Choisissez un pseudo (il apparaîtra dans le classement).</p>
+    <input type="text" id="pseudoIn" maxlength="20" placeholder="Votre pseudo" autocomplete="off">
+    <button class="btn primary block" id="joinBtn">Entrer</button>
+    <p class="muted" style="font-size:.8rem">Pas de compte nécessaire. Vous pourrez modifier votre réponse tant que l’enseignant n’a pas validé.</p>
+  </div></section>
+
+  <section id="sWait" class="center hidden"><div class="card" style="text-align:center">
+    <div class="spinner"></div><h2 id="sWaitTitle">En attente de l’enseignant…</h2>
+    <p class="muted" id="sWaitText">La première question va bientôt s’afficher.</p>
+  </div></section>
+
+  <section id="sQ" class="wrap hidden">
+    <div class="eyebrow" id="sQnum"></div>
+    <h2 id="sQtheme"></h2>
+    <p style="font-weight:600" id="sQstem"></p>
+    <div class="ctx" id="sQctx"></div>
+    <div class="opts" id="sOpts"></div>
+    <div id="sReveal" class="hidden"></div>
+    <div class="sentbar" id="sSendBar">
+      <button class="btn primary block" id="sendBtn">Envoyer ma réponse</button>
+      <div class="status" id="sStatus"></div>
+    </div>
+  </section>
+
+  <section id="sEnd" class="center hidden"><div class="card" style="text-align:center">
+    <div class="eyebrow">Fin de la séance</div>
+    <h1 id="sEndScore">—</h1>
+    <p class="muted" id="sEndRank"></p>
+    <p style="margin-top:10px">Merci pour votre participation !</p>
+  </div></section>
+
+  <p style="text-align:center;padding:10px"><a href="#" id="toProf" style="font-size:.78rem;color:var(--muted)">Espace enseignant</a></p>
+</div>
+
+<!-- ================= ENSEIGNANT ================= -->
+<div id="prof" class="hidden">
+  <section id="pLogin" class="center"><div class="card stack" style="background:#fff;color:var(--ink)">
+    <div class="eyebrow">Écran enseignant</div>
+    <h1>Code d’accès</h1>
+    <input type="password" id="pinIn" placeholder="Code" inputmode="numeric">
+    <button class="btn primary block" id="pinBtn">Ouvrir le tableau de bord</button>
+    <p class="muted" id="pinErr" style="color:var(--bad)"></p>
+  </div></section>
+
+  <div id="pMain" class="hidden">
+    <div class="pwrap">
+      <!-- Lobby -->
+      <div id="pLobby" class="card">
+        <div class="lobby">
+          <div class="qr"><img id="qrImg" alt="QR code pour rejoindre"></div>
+          <div>
+            <div class="eyebrow">Rejoignez la séance</div>
+            <h1 class="qtitle">Mésothéliome pleural chez un ancien calorifugeur</h1>
+            <p class="muted" style="margin-bottom:10px">Scannez le QR code ou ouvrez ce lien sur votre téléphone :</p>
+            <div class="joinurl" id="joinUrl"></div>
+            <p style="margin-top:16px;font-size:1.3rem"><b id="lobbyCount">0</b> étudiant(s) connecté(s)</p>
+            <div class="names" id="lobbyNames"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question -->
+      <div id="pQuestion" class="pgrid hidden">
+        <div class="card" id="pQcard">
+          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+            <div class="eyebrow" id="pQnum"></div>
+            <div class="qdots" id="qdots"></div>
+          </div>
+          <h1 class="qtitle" id="pQtheme"></h1>
+          <p class="qstem" id="pQstem"></p>
+          <div class="ctx" id="pQctx"></div>
+          <div class="bars" id="pBars"></div>
+          <div id="pExpl" class="hidden"></div>
+        </div>
+        <div class="side">
+          <div class="kpi">
+            <div class="card"><div class="big" id="kResp">0</div><span>réponses reçues</span></div>
+            <div class="card"><div class="big" id="kPlayers">0</div><span>connectés</span></div>
+          </div>
+          <div class="card"><div style="display:flex;justify-content:space-between"><b>Participation</b><b id="kPart">0 %</b></div><div class="ring"><i id="kRing"></i></div></div>
+          <div class="card hidden" id="kExactCard"><div class="big" id="kExact">0 %</div><span>de réponses entièrement exactes</span></div>
+          <div class="card"><h2 style="font-size:1rem">Top 5 provisoire</h2><ol class="lead" id="miniLead"></ol></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="cPrev">← Précédent</button>
+      <button class="btn primary" id="cMain">Lancer le QCM 1</button>
+      <button class="btn" id="cReopen">Rouvrir le vote</button>
+      <label class="switch" title="Évite l’effet de groupe : les pourcentages restent cachés jusqu’à la validation"><input type="checkbox" id="cBlind"> Masquer les % pendant le vote</label>
+      <span class="grow"></span>
+      <button class="btn sage" id="cLead">🏆 Classement</button>
+      <button class="btn" id="cLobby">QR code</button>
+      <button class="btn danger" id="cClear">Effacer les votes du QCM</button>
+      <button class="btn danger" id="cReset">Nouvelle séance</button>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="leadModal"><div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h1 class="qtitle" style="margin:0">🏆 Classement</h1><button class="btn" id="leadClose">Fermer</button></div>
+    <p class="muted" style="margin-bottom:12px" id="leadNote"></p>
+    <ol class="lead" id="fullLead"></ol>
+  </div></div>
+</div>
+
+<div id="setupErr" class="center hidden"><div class="card"><h2>Connexion impossible</h2><p class="muted" id="setupMsg"></p></div></div>
+
+<script>
+(() => {
+"use strict";
+const QCM = [
+{
+  theme:"Imagerie thoracique", chip:"Pneumologie",
+  stem:"Concernant la radiographie et la TDM de M. K., quelles propositions sont exactes ?",
+  ctx:"Rx : épanchement droit, plaques calcifiées diaphragmatiques bilatérales. TDM : épaississement pleural droit circonférentiel, nodulaire, 18 mm, atteignant la plèvre médiastinale ; rétraction de l’hémithorax droit.",
+  o:[
+    ["Les plaques pleurales calcifiées sont un marqueur d’exposition à l’amiante et non une lésion précancéreuse.",1,"Les plaques sont des lésions fibro-hyalines de la plèvre pariétale ; elles témoignent de l’exposition mais ne dégénèrent pas en mésothéliome. Leur présence augmente la probabilité d’une exposition significative, pas la probabilité de transformation."],
+    ["L’épaississement circonférentiel, nodulaire, de plus de 1 cm et atteignant la plèvre médiastinale oriente vers une atteinte pleurale maligne.",1,"Ce sont les critères de Leung : bonne spécificité pour la malignité pleurale, sans permettre de distinguer mésothéliome et métastase."],
+    ["L’absence de plaques pleurales aurait rendu le diagnostic de mésothéliome improbable chez ce patient.",0,"Piège fréquent : une proportion importante de mésothéliomes survient sans plaques visibles. L’absence de plaques n’exclut ni l’exposition ni la maladie."],
+    ["Un épanchement abondant sans déviation médiastinale controlatérale doit faire évoquer un engainement pleural ou une rétraction de l’hémithorax.",1,"Un épanchement massif refoule normalement le médiastin. Son absence suggère un poumon « engainé » (fixation par une coque tumorale), une atteinte du médiastin, ou une obstruction bronchique — tous éléments d’alerte."],
+    ["Le TEP-TDM est indispensable pour poser le diagnostic positif de mésothéliome.",0,"Le TEP-TDM n’est pas un outil diagnostic : il participe au bilan d’extension et peut guider une biopsie. Il est en outre faussement positif après talcage (inflammation durable)."]
+  ],
+  debate:"Faut-il réaliser la TDM avant ou après l’évacuation complète du liquide ? Les recommandations ERS 2020 conseillent une TDM injectée, idéalement avant vidange complète pour l’analyse pleurale — mais l’urgence symptomatique peut imposer l’inverse. Faites voter la classe.",
+  key:"L’imagerie suspecte ; elle ne prouve pas. Plaques = exposition, pas précancer.",
+  refs:"Leung AN et al., AJR 1990 · Scherpereel A et al., Eur Respir J 2020 (ERS/ESTS/EACTS/ESTRO)."
+},
+{
+  theme:"Explorations fonctionnelles respiratoires", chip:"Pneumologie",
+  stem:"Interprétation des EFR de M. K. : quelles propositions sont exactes ?",
+  ctx:"CVF 66 % (<LIN), VEMS 69 % (<LIN), VEMS/CVF 0,79 (>LIN), CPT 71 % (<LIN), DLCO 63 % (<LIN), KCO 104 %.",
+  o:[
+    ["Il existe un trouble ventilatoire restrictif, confirmé par la mesure de la CPT.",1,"La restriction se définit par une CPT < LIN. Ici elle est mesurée en pléthysmographie : le diagnostic est formel."],
+    ["Une CVF basse avec un rapport VEMS/CVF normal suffit à affirmer la restriction, sans mesure des volumes statiques.",0,"Une CVF basse n’est qu’une « restriction présumée » : une partie de ces profils correspond à un piégeage ou à une pseudo-restriction (PRISm). Seule la CPT tranche (ERS/ATS 2022)."],
+    ["La DLCO abaissée avec une KCO normale oriente vers un mécanisme extraparenchymateux (pleural) plutôt qu’interstitiel.",1,"La DLCO baisse parce que le volume alvéolaire accessible (VA) est réduit, mais le transfert par unité de volume (KCO) est préservé : c’est le profil des atteintes pleurales ou pariétales. Dans une fibrose interstitielle, la KCO est abaissée."],
+    ["Ce profil fonctionnel permet d’affirmer une asbestose associée.",0,"L’asbestose est une fibrose interstitielle : elle se diagnostique sur la TDM haute résolution (réticulations basales sous-pleurales, rayon de miel) avec une KCO typiquement abaissée. Rien de cela ici."],
+    ["Ces EFR serviront de référence pour le suivi et l’évaluation du retentissement fonctionnel dans le dossier de réparation.",1,"Le taux d’incapacité permanente repose notamment sur l’atteinte fonctionnelle : une évaluation initiale documentée est indispensable, en tenant compte du rôle confondant de l’épanchement."]
+  ],
+  debate:"Les EFR ont été faites après évacuation partielle : sont-elles interprétables pour fixer un taux d’incapacité ? Faut-il les refaire après pleurodèse, à distance ? Débat utile sur la stabilité de l’état et la date de consolidation.",
+  key:"Restriction = CPT. DLCO basse + KCO normale = mécanisme extraparenchymateux.",
+  refs:"Stanojevic S et al., ERS/ATS technical standard on interpretive strategies, Eur Respir J 2022 · GLI reference equations."
+},
+{
+  theme:"Stratégie diagnostique et anatomopathologie", chip:"Diagnostic",
+  stem:"Cytologie non conclusive, TDM suspecte. Quelles propositions sont exactes ?",
+  ctx:"Exsudat lymphocytaire, ADA 22 UI/L, cytologie : cellules mésothéliales réactives sans cellule tumorale formelle.",
+  o:[
+    ["La thoracoscopie avec biopsies pariétales multiples et étagées est l’examen de référence pour obtenir le diagnostic.",1,"Elle permet de visualiser la plèvre, de prélever en profondeur (graisse extrapleurale pour juger l’invasion) et de réaliser une pleurodèse dans le même temps. Rentabilité diagnostique supérieure à 90 %."],
+    ["Le diagnostic repose sur au moins deux marqueurs mésothéliaux positifs et deux marqueurs carcinomateux négatifs en immunohistochimie.",1,"Ex. : calrétinine, WT1, CK5/6, D2-40 positifs ; TTF-1, napsine A, CEA, claudine-4, Ber-EP4/MOC-31 négatifs. Le panel est adapté au contexte (primitif suspecté)."],
+    ["Un taux de mésothéline sérique élevé permet de confirmer le diagnostic sans histologie.",0,"Les biomarqueurs (mésothéline/SMRP, fibuline-3, acide hyaluronique pleural) ont une sensibilité et une spécificité insuffisantes ; ils ne remplacent jamais l’histologie et ne figurent pas dans les critères diagnostiques."],
+    ["La perte d’expression de BAP1 ou de MTAP (ou la délétion de CDKN2A) aide à distinguer un mésothéliome d’une prolifération mésothéliale réactive.",1,"Ces anomalies sont absentes des proliférations réactives : leur présence plaide pour la malignité, notamment sur de petits prélèvements. Leur absence n’exclut pas le mésothéliome."],
+    ["Une biopsie à l’aiguille unique et de petite taille fournit toujours un sous-type histologique fiable.",0,"Les petits prélèvements sous-estiment les formes biphasiques (composante sarcomatoïde manquée). Or le sous-type conditionne pronostic et choix thérapeutique."]
+  ],
+  debate:"Dans un contexte d’endémie tuberculeuse, un ADA bas suffit-il à écarter une tuberculose pleurale et à ne pas attendre la culture ? Et faut-il exiger une relecture par un pathologiste expert avant la déclaration de maladie professionnelle ?",
+  key:"Le tissu fait le diagnostic ; l’immunohistochimie et la relecture experte le sécurisent.",
+  refs:"Husain AN et al., Arch Pathol Lab Med 2018 (IMIG) · Classification OMS des tumeurs thoraciques 2021 · ERS 2020."
+},
+{
+  theme:"Exposition et imputabilité", chip:"Médecine du travail",
+  stem:"Concernant le lien entre l’exposition de M. K. et son mésothéliome, quelles propositions sont exactes ?",
+  ctx:"Exposition de 1978 à 2003 (calorifugeage puis dépose d’isolants) ; diagnostic en 2026 ; tabac 15 PA sevré.",
+  o:[
+    ["La latence, comptée depuis le début de l’exposition, est d’environ 48 ans, ce qui est compatible avec un mésothéliome.",1,"La latence se compte depuis la première exposition. 30 à 40 ans en moyenne, avec des extrêmes plus longs : 48 ans est parfaitement compatible."],
+    ["Les 23 ans écoulés depuis la fin de l’exposition correspondent à la latence de la maladie.",0,"Piège majeur. Le temps écoulé entre la fin d’exposition et la première constatation correspond à la notion réglementaire de délai de prise en charge, pas à la latence biologique."],
+    ["Le tabagisme de 15 paquets-années potentialise de façon multiplicative le risque de mésothéliome.",0,"Le tabac n’est pas un facteur de risque du mésothéliome. La synergie multiplicative tabac × amiante concerne le cancer bronchopulmonaire. Confusion très fréquente."],
+    ["Aucun seuil d’exposition sans risque n’est démontré ; des expositions faibles ou brèves peuvent suffire, même si le risque croît avec la dose cumulée.",1,"Relation dose-effet sans seuil connu : des mésothéliomes surviennent après expositions faibles (domestiques, environnementales). D’où l’importance de rechercher l’exposition chez l’épouse."],
+    ["Les amphiboles ont un pouvoir mésothéliomatogène supérieur au chrysotile, sans que ce dernier puisse être considéré comme inoffensif.",1,"Gradient de puissance amphiboles > chrysotile, mais le chrysotile est classé cancérogène avéré (CIRC groupe 1) et associé au mésothéliome. Les calorifuges anciens contenaient fréquemment des amphiboles (amosite)."]
+  ],
+  debate:"Sans aucune mesure historique de fibres, peut-on parler d’exposition « forte » ? Comparer l’approche par matrice emplois-expositions, par l’expertise du poste et par les témoignages. Que pèse un témoignage face à des archives incomplètes ?",
+  key:"Latence ≠ délai de prise en charge. Tabac : pas de lien avec le mésothéliome.",
+  refs:"CIRC Monographies vol. 100C (2012) · HAS 2010, suivi post-professionnel amiante."
+},
+{
+  theme:"Cadre médico-légal algérien", chip:"Médico-légal",
+  stem:"Concernant la reconnaissance de la maladie professionnelle de M. K. en Algérie, quelles propositions sont exactes ?",
+  ctx:"Retraité depuis 2018. Première constatation médicale : 18/09/2026. Confirmation histologique : 02/10/2026. Fin d’exposition : 2003.",
+  o:[
+    ["Étant retraité, M. K. ne peut plus prétendre à une reconnaissance en maladie professionnelle.",0,"Faux : la maladie professionnelle peut être reconnue après la cessation d’activité dès lors que les conditions réglementaires sont réunies, notamment le délai de prise en charge. C’est la règle pour les cancers à longue latence."],
+    ["Le délai de prise en charge s’apprécie entre la fin de l’exposition (2003) et la première constatation médicale, et doit être confronté au délai fixé par le tableau algérien n° 30.",1,"C’est la définition même du délai de prise en charge. Le délai précis et l’éventuelle durée minimale d’exposition doivent être lus dans le tableau algérien, sans transposer ceux du tableau français."],
+    ["Lorsque toutes les conditions du tableau sont remplies, la victime bénéficie d’une présomption d’origine et n’a pas à prouver le lien de causalité.",1,"Principe de la présomption d’imputabilité propre au système des tableaux : la victime établit la maladie, l’exposition et le respect des délais, pas la causalité scientifique."],
+    ["La date de première constatation médicale est obligatoirement la date de la confirmation histologique (02/10/2026).",0,"Piège classique : la première constatation médicale correspond au premier document médical objectivant la maladie (ici le 18/09/2026), qui peut précéder la confirmation. Bien la documenter peut être décisif pour le respect des délais."],
+    ["La déclaration à la CNAS incombe à la victime (ou à ses ayants droit), accompagnée du certificat médical initial, dans les délais fixés par la loi n° 83-13.",1,"La démarche est à l’initiative de la victime ; le médecin fournit le certificat. Les délais légaux de déclaration doivent être vérifiés dans le texte en vigueur et respectés."]
+  ],
+  debate:"L’enseignant peut projeter côte à côte le tableau 30 algérien et le tableau 30 français : en quoi diffèrent-ils (délai, durée d’exposition, liste de travaux) ? Que faire si une condition n’est pas remplie ? Les dispositifs français (CRRMP, FIVA) n’ont pas d’équivalent automatique : quels recours existent localement ?",
+  key:"Trois dates, trois rôles. Présomption d’origine si le tableau est respecté. Retraite ≠ perte de droits.",
+  refs:"Loi n° 83-13 du 2 juillet 1983 · Arrêté interministériel du 5 mai 1996 (tableaux), JORADP — vérifier articles et délais dans la version en vigueur."
+},
+{
+  theme:"Certificat médical initial", chip:"Médico-légal",
+  stem:"Le pneumologue rédige le certificat médical initial de maladie professionnelle. Quelles propositions sont exactes ?",
+  ctx:"Pièces disponibles : CR histologique et immunohistochimique, TDM, interrogatoire professionnel, deux attestations d’emploi, deux témoignages.",
+  o:[
+    ["Il décrit précisément la maladie constatée et ses éléments de preuve (nature histologique, immunohistochimie, date de constatation).",1,"Le certificat est descriptif et objectif ; la précision du diagnostic et des dates est décisive pour l’instruction."],
+    ["Il peut conclure que la maladie « est reconnue comme maladie professionnelle ».",0,"Le médecin n’a pas compétence pour reconnaître : il constate, décrit et peut mentionner le caractère susceptible d’être professionnel. La reconnaissance relève de l’organisme (CNAS)."],
+    ["Il peut mentionner l’exposition à l’amiante en la rapportant comme déclarée par le patient (« le patient déclare avoir été exposé… »).",1,"Le médecin n’a pas été témoin de l’exposition : il la rapporte. Distinguer ce qui est constaté de ce qui est allégué protège le patient comme le médecin."],
+    ["Seul un médecin spécialiste agréé par la CNAS est habilité à rédiger ce certificat.",0,"Tout médecin (généraliste, pneumologue, médecin du travail…) peut établir le certificat médical initial. Croire l’inverse retarde inutilement les démarches."],
+    ["Le certificat est remis au patient, qui en dispose pour sa déclaration, plutôt que transmis directement à l’employeur.",1,"Le secret médical s’impose : le certificat appartient au patient, qui l’adresse à l’organisme. L’employeur n’a pas à recevoir le diagnostic."]
+  ],
+  debate:"Faut-il écrire « mésothéliome pleural malin compatible avec une exposition professionnelle à l’amiante » ou s’en tenir au diagnostic seul ? Jusqu’où le médecin peut-il aller dans l’appréciation du lien sans sortir de son rôle ?",
+  key:"Constater, décrire, rapporter — ne jamais reconnaître ni chiffrer une exposition non mesurée.",
+  refs:"Code de déontologie médicale algérien (décret exécutif n° 92-276), règles relatives aux certificats et au secret médical."
+},
+{
+  theme:"Prise en charge thérapeutique", chip:"Oncologie thoracique",
+  stem:"Mésothéliome épithélioïde, sans métastase, ECOG 1, épanchement talqué. Quelles propositions sont exactes ?",
+  ctx:"RCP du 09/10/2026. HTA traitée. Pas de comorbidité contre-indiquant une immunothérapie.",
+  o:[
+    ["La stratégie doit être décidée en réunion de concertation pluridisciplinaire, idéalement avec un centre expert.",1,"Rareté de la tumeur, diversité des options et rapport bénéfice/risque délicat justifient une RCP spécialisée."],
+    ["Une pleurectomie-décortication étendue est recommandée en routine chez les formes épithélioïdes opérables.",0,"L’essai randomisé MARS2 n’a pas montré de bénéfice de la chirurgie de réduction tumorale ajoutée à la chimiothérapie, avec davantage d’effets indésirables. La chirurgie n’est plus proposée en routine hors protocole."],
+    ["En première ligne, l’association nivolumab + ipilimumab ou une chimiothérapie platine-pemetrexed (± bevacizumab ou pembrolizumab) sont des options validées, à choisir selon l’histologie, l’état général et l’accès.",1,"CheckMate 743 (bénéfice surtout marqué dans les formes non épithélioïdes), IND.227/KEYNOTE-483 et MAPS ont établi ces options. La disponibilité locale est un vrai paramètre de décision."],
+    ["Une radiothérapie prophylactique des orifices de thoracoscopie doit être réalisée systématiquement.",0,"Les essais SMART et PIT n’ont pas montré de bénéfice d’une irradiation prophylactique systématique des trajets ; elle n’est plus recommandée en routine."],
+    ["Le contrôle de l’épanchement (talcage ou cathéter pleural tunnelisé) et la prise en charge de la douleur relèvent de soins de support à mettre en place d’emblée.",1,"Les soins de support précoces améliorent la qualité de vie ; le cathéter tunnelisé est privilégié en cas de poumon non réexpansible."]
+  ],
+  debate:"Pour une forme épithélioïde, immunothérapie double ou chimio-immunothérapie ? Le bénéfice de nivolumab + ipilimumab est moins net dans ce sous-type. Et si ces molécules ne sont pas disponibles localement, quelle stratégie défendre ?",
+  key:"Soigner le patient autant que la tumeur : RCP, traitement systémique, soins de support d’emblée.",
+  refs:"Baas P et al., Lancet 2021 · Chu Q et al., Lancet 2023 · Zalcman G et al., Lancet 2016 (MAPS) · Lim E et al., Lancet Respir Med 2024 (MARS2) · Bibby AC et al., Lancet Respir Med 2016 (SMART) · ESMO 2022."
+},
+{
+  theme:"Prévention, traçabilité et dimension collective", chip:"Médecine du travail",
+  stem:"D’anciens collègues de M. K. ont réalisé les mêmes tâches ; certains travaillent encore sur ces installations. Quelles propositions sont exactes ?",
+  ctx:"Amiante interdit en Algérie depuis 2009, mais présent dans d’anciens calorifuges, faux plafonds et canalisations encore en place.",
+  o:[
+    ["Ce cas sentinelle justifie d’alerter la médecine du travail pour repérer les co-exposés, dans le respect du secret médical.",1,"Un cas révèle un risque collectif. L’alerte porte sur le risque et les postes, jamais sur le diagnostic nominatif sans l’accord du patient."],
+    ["Un scanner thoracique annuel doit être proposé à tous les anciens collègues pour dépister précocement le mésothéliome.",0,"Aucun dépistage du mésothéliome n’a démontré de bénéfice. Le suivi post-professionnel par TDM (intervalles de 5 à 10 ans selon le niveau d’exposition dans les recommandations françaises) vise surtout les pathologies bénignes et la traçabilité ; le dépistage du cancer bronchopulmonaire relève d’autres critères (âge, tabac)."],
+    ["L’interdiction de l’amiante supprime tout risque d’exposition professionnelle actuel.",0,"L’amiante en place reste un risque majeur pour les travailleurs de maintenance, de démolition et de désamiantage. La réglementation de prévention (décret de 1999) garde toute sa pertinence."],
+    ["L’exposition para-professionnelle de l’épouse, qui lavait les bleus de travail, doit être recherchée et faire l’objet d’une information.",1,"Des mésothéliomes sont décrits chez les proches de travailleurs exposés. L’information doit être proportionnée, sans examens systématiques injustifiés."],
+    ["Les travailleurs actuels exposés lors de retraits d’isolants relèvent d’abord de mesures collectives (confinement, aspiration, humidification), complétées par des EPI et une surveillance médicale renforcée.",1,"Hiérarchie des mesures de prévention : supprimer et réduire à la source avant de protéger l’individu. Le masque seul ne suffit jamais."]
+  ],
+  debate:"Faut-il informer activement d’anciens collègues d’un risque pour lequel il n’existe pas de dépistage efficace ? Bénéfices (droits, traçabilité, arrêt du tabac) contre anxiété induite : un vrai dilemme éthique à faire trancher par la classe.",
+  key:"Un cas, un risque collectif : tracer, informer, prévenir à la source.",
+  refs:"Décret exécutif n° 99-95 du 19 avril 1999 · Décret exécutif n° 09-321 (2009) · HAS 2010, suivi post-professionnel après exposition à l’amiante."
+}
+];
+const N = QCM.length, L = "ABCDE";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const params = new URLSearchParams(location.search);
+const S = (params.get("s") || DEFAULT_SESSION).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 30) || DEFAULT_SESSION;
+const BASE = "sessions/" + S;
+const isProf = params.has("prof");
+const goodSet = QCM.map(q => q.o.map((o, i) => o[1] ? i : -1).filter(i => i >= 0));
+
+/* ---------- Couche de données : Firebase ou démo locale ---------- */
+const DB = {};
+async function initDB() {
+  if (!FIREBASE_CONFIG.apiKey) {
+    $("#demoBadge").classList.remove("hidden");
+    const KEY = "qcmlive-db", subs = [];
+    const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
+    const at = (tree, path) => path.split("/").reduce((o, k) => (o == null ? null : o[k]), tree) ?? null;
+    const notify = () => { const t = read(); subs.forEach(s => s.cb(at(t, s.path))); };
+    const write = (path, val, merge) => {
+      const t = read(), ks = path.split("/"); let o = t;
+      ks.slice(0, -1).forEach(k => { if (typeof o[k] !== "object" || o[k] === null) o[k] = {}; o = o[k]; });
+      const last = ks[ks.length - 1];
+      if (val === null) delete o[last];
+      else if (merge) o[last] = Object.assign(typeof o[last] === "object" && o[last] ? o[last] : {}, val);
+      else o[last] = val;
+      localStorage.setItem(KEY, JSON.stringify(t)); notify();
+    };
+    addEventListener("storage", e => { if (e.key === KEY) notify(); });
+    DB.set = (p, v) => (write(p, v), Promise.resolve());
+    DB.update = (p, v) => (write(p, v, true), Promise.resolve());
+    DB.remove = p => (write(p, null), Promise.resolve());
+    DB.on = (path, cb) => { const s = { path, cb }; subs.push(s); cb(at(read(), path)); return () => subs.splice(subs.indexOf(s), 1); };
+    return;
+  }
+  const V = "10.12.2";
+  const app = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+  const fdb = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-database.js`);
+  const db = fdb.getDatabase(app.initializeApp(FIREBASE_CONFIG));
+  DB.set = (p, v) => fdb.set(fdb.ref(db, p), v);
+  DB.update = (p, v) => fdb.update(fdb.ref(db, p), v);
+  DB.remove = p => fdb.remove(fdb.ref(db, p));
+  DB.on = (p, cb) => fdb.onValue(fdb.ref(db, p), snap => cb(snap.val()), err => fail("Lecture refusée par la base (vérifiez les règles Firebase). " + err.message));
+}
+function fail(msg) { $("#setupMsg").textContent = msg; $("#setupErr").classList.remove("hidden"); }
+
+/* ---------- Utilitaires de score ---------- */
+const parseSel = s => (s == null || s === "") ? [] : String(s).split(",").map(Number);
+const revealedList = st => parseSel(st && st.rev);
+function judge(q, sel) {
+  const set = new Set(sel);
+  const pts = QCM[q].o.reduce((s, o, i) => s + ((o[1] === 1) === set.has(i) ? 1 : 0), 0);
+  return { pts, exact: pts === 5 };
+}
+function leaderboard(players, votes, revealed) {
+  const rows = Object.entries(players || {}).map(([id, p]) => {
+    let exact = 0, pts = 0;
+    revealed.forEach(q => { const v = votes && votes[q] && votes[q][id]; if (v) { const j = judge(q, parseSel(v.s)); pts += j.pts; if (j.exact) exact++; } });
+    return { id, name: p.p || "?", exact, pts };
+  });
+  rows.sort((a, b) => b.exact - a.exact || b.pts - a.pts || a.name.localeCompare(b.name));
+  return rows;
+}
+
+/* =========================================================
+   ÉCRAN ÉTUDIANT
+   ========================================================= */
+function student() {
+  $("#student").classList.remove("hidden");
+  let id = localStorage.getItem("qcmlive-id-" + S);
+  if (!id) { id = "u" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem("qcmlive-id-" + S, id); }
+  let pseudo = localStorage.getItem("qcmlive-pseudo-" + S) || "";
+  let st = null, sel = new Set(), sentFor = null, renderedQ = null, renderedPhase = null, offVote = null, myVotes = {};
+  const show = sec => ["#sJoin", "#sWait", "#sQ", "#sEnd"].forEach(x => $(x).classList.toggle("hidden", x !== sec));
+
+  $("#toProf").onclick = e => { e.preventDefault(); location.href = location.pathname + "?s=" + S + "&prof"; };
+  $("#pseudoIn").value = pseudo;
+  const join = () => {
+    const p = $("#pseudoIn").value.trim().slice(0, 20);
+    if (p.length < 2) { $("#pseudoIn").focus(); return; }
+    pseudo = p; localStorage.setItem("qcmlive-pseudo-" + S, p);
+    DB.set(`${BASE}/players/${id}`, { p, t: Date.now() });
+    $("#sPseudo").textContent = p;
+    start();
+  };
+  $("#joinBtn").onclick = join;
+  $("#pseudoIn").addEventListener("keydown", e => { if (e.key === "Enter") join(); });
+  if (pseudo) { $("#sPseudo").textContent = pseudo; DB.update(`${BASE}/players/${id}`, { p: pseudo, t: Date.now() }); start(); } else show("#sJoin");
+
+  function start() {
+    DB.on(`${BASE}/state`, s => { st = s || { q: -1, phase: "lobby" }; render(); });
+    DB.on(`${BASE}/votes`, v => { myVotes = {}; Object.entries(v || {}).forEach(([q, all]) => { if (all && all[id]) myVotes[q] = all[id]; }); updateScore(); if (st) render(); });
+  }
+  function updateScore() {
+    let exact = 0; revealedList(st).forEach(q => { if (myVotes[q] && judge(q, parseSel(myVotes[q].s)).exact) exact++; });
+    $("#sScore").innerHTML = `Score <b>${exact}</b>/${revealedList(st).length || 0}`;
+  }
+
+  function render() {
+    updateScore();
+    if (st.phase === "lobby" || st.q < 0) { show("#sWait"); $("#sWaitTitle").textContent = "En attente de l’enseignant…"; $("#sWaitText").textContent = "Vous êtes bien connecté(e) : " + pseudo; renderedQ = null; return; }
+    if (st.phase === "end") { endScreen(); return; }
+    const q = st.q;
+    if (renderedQ !== q) {
+      renderedQ = q; renderedPhase = null;
+      const mine = myVotes[q]; sel = new Set(parseSel(mine && mine.s)); sentFor = mine ? mine.s : null;
+      const d = QCM[q];
+      $("#sQnum").textContent = `QCM ${q + 1} / ${N} · plusieurs réponses possibles`;
+      $("#sQtheme").textContent = d.theme; $("#sQstem").textContent = d.stem; $("#sQctx").textContent = d.ctx;
+      $("#sOpts").innerHTML = d.o.map((o, i) => `<button class="opt" data-i="${i}"><span class="ltr">${L[i]}</span><span>${esc(o[0])}</span><span class="mk"></span></button>`).join("");
+      $("#sOpts").querySelectorAll(".opt").forEach(b => b.onclick = () => {
+        if (st.phase !== "vote") return;
+        const i = +b.dataset.i; sel.has(i) ? sel.delete(i) : sel.add(i); paintOpts(); statusLine();
+      });
+      scrollTo(0, 0);
+    }
+    show("#sQ");
+    if (renderedPhase !== st.phase) { renderedPhase = st.phase; if (st.phase === "reveal") { const mine = myVotes[q]; sel = new Set(parseSel(mine && mine.s)); } }
+    paintOpts(); statusLine();
+  }
+  function paintOpts() {
+    const q = st.q, rev = st.phase === "reveal";
+    $("#sOpts").querySelectorAll(".opt").forEach((b, i) => {
+      const s = sel.has(i), g = QCM[q].o[i][1] === 1, mk = b.querySelector(".mk");
+      b.className = "opt"; mk.textContent = "";
+      const old = b.querySelector(".why"); if (old) old.remove();
+      if (!rev) { if (s) b.classList.add("sel"); return; }
+      if (s && g) { b.classList.add("good"); mk.textContent = "✓"; }
+      else if (s && !g) { b.classList.add("bad"); mk.textContent = "✕"; }
+      else if (!s && g) { b.classList.add("miss"); mk.textContent = "✓"; }
+      else b.classList.add("neutral");
+      const w = document.createElement("span"); w.className = "why"; w.textContent = QCM[q].o[i][2]; b.append(w);
+    });
+    $("#sSendBar").classList.toggle("hidden", rev);
+    const R = $("#sReveal");
+    if (rev) {
+      const mine = myVotes[q], j = mine ? judge(q, parseSel(mine.s)) : null;
+      R.innerHTML = `<div class="callout ${j && j.exact ? "" : (j ? "warn" : "bad")}"><b>${j ? (j.exact ? "✓ Réponse exacte !" : `${j.pts}/5 propositions bien jugées`) : "Aucune réponse envoyée"}</b><br>Bonnes réponses : ${goodSet[q].map(i => L[i]).join(", ")}</div>
+        <div class="callout"><b>À retenir :</b> ${esc(QCM[q].key)}</div>
+        <div class="callout warn"><b>Débat :</b> ${esc(QCM[q].debate)}</div>`;
+      R.classList.remove("hidden");
+    } else R.classList.add("hidden");
+  }
+  function statusLine() {
+    const cur = [...sel].sort().join(","), el = $("#sStatus"), btn = $("#sendBtn");
+    btn.disabled = !sel.size;
+    if (sentFor != null && sentFor === cur) { el.className = "status ok"; el.textContent = "✓ Réponse envoyée — modifiable jusqu’à la validation"; btn.textContent = "Réponse envoyée"; btn.disabled = true; }
+    else { el.className = "status"; el.textContent = sentFor != null ? "Modification non envoyée" : (sel.size ? "" : "Cochez une ou plusieurs propositions"); btn.textContent = sentFor != null ? "Mettre à jour ma réponse" : "Envoyer ma réponse"; }
+  }
+  $("#sendBtn").onclick = () => {
+    if (!st || st.phase !== "vote" || !sel.size) return;
+    const s = [...sel].sort().join(",");
+    DB.set(`${BASE}/votes/${st.q}/${id}`, { s, p: pseudo, t: Date.now() }).then(() => { sentFor = s; statusLine(); });
+    sentFor = s; statusLine();
+  };
+  function endScreen() {
+    show("#sEnd");
+    if (offVote) return;
+    let players = {}, votes = {};
+    const upd = () => {
+      const rows = leaderboard(players, votes, revealedList(st)), r = rows.findIndex(x => x.id === id);
+      const me = rows[r];
+      $("#sEndScore").textContent = me ? `${me.exact} / ${revealedList(st).length} QCM exacts` : "—";
+      $("#sEndRank").textContent = me ? `Classement : ${r + 1}ᵉ sur ${rows.length} · ${me.pts} propositions bien jugées` : "";
+    };
+    DB.on(`${BASE}/players`, p => { players = p || {}; upd(); });
+    offVote = DB.on(`${BASE}/votes`, v => { votes = v || {}; upd(); });
+  }
+}
+
+/* =========================================================
+   ÉCRAN ENSEIGNANT
+   ========================================================= */
+function prof() {
+  document.body.classList.add("prof");
+  $("#prof").classList.remove("hidden");
+  const unlock = () => { $("#pLogin").classList.add("hidden"); $("#pMain").classList.remove("hidden"); run(); };
+  if (sessionStorage.getItem("qcmlive-prof") === PROF_PIN) { unlock(); return; }
+  const tryPin = () => { if ($("#pinIn").value === PROF_PIN) { sessionStorage.setItem("qcmlive-prof", PROF_PIN); unlock(); } else $("#pinErr").textContent = "Code incorrect."; };
+  $("#pinBtn").onclick = tryPin; $("#pinIn").addEventListener("keydown", e => { if (e.key === "Enter") tryPin(); });
+  $("#pinIn").focus();
+
+  function run() {
+    let st = { q: -1, phase: "lobby", rev: "" }, players = {}, votes = {}, showLobby = false;
+    const url = location.origin + location.pathname + "?s=" + encodeURIComponent(S);
+    $("#joinUrl").textContent = url;
+    $("#qrImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=272x272&margin=0&data=" + encodeURIComponent(url);
+    $("#qrImg").onerror = () => { $("#qrImg").parentElement.innerHTML = '<p style="color:#14233a;text-align:center;font-weight:700;padding:10px">QR indisponible hors ligne : utilisez le lien ci-contre</p>'; };
+
+    DB.on(`${BASE}/state`, s => { st = s || { q: -1, phase: "lobby", rev: "" }; render(); });
+    DB.on(`${BASE}/players`, p => { players = p || {}; render(); });
+    DB.on(`${BASE}/votes`, v => { votes = v || {}; render(); });
+
+    const setState = patch => DB.set(`${BASE}/state`, Object.assign({ q: st.q, phase: st.phase, rev: st.rev || "" }, patch));
+    const addRev = q => { const r = new Set(revealedList(st)); r.add(q); return [...r].sort((a, b) => a - b).join(","); };
+
+    $("#cMain").onclick = () => {
+      showLobby = false;
+      if (st.phase === "lobby" || st.q < 0) setState({ q: 0, phase: "vote" });
+      else if (st.phase === "vote") setState({ phase: "reveal", rev: addRev(st.q) });
+      else if (st.phase === "reveal") st.q < N - 1 ? setState({ q: st.q + 1, phase: revealedList(st).includes(st.q + 1) ? "reveal" : "vote" }) : setState({ phase: "end" });
+      else if (st.phase === "end") openLead();
+    };
+    $("#cPrev").onclick = () => { if (st.q > 0) { showLobby = false; setState({ q: st.q - 1, phase: revealedList(st).includes(st.q - 1) ? "reveal" : "vote" }); } };
+    $("#cReopen").onclick = () => { if (st.q >= 0) { const r = revealedList(st).filter(x => x !== st.q).join(","); setState({ phase: "vote", rev: r }); } };
+    $("#cBlind").onchange = render;
+    $("#cLobby").onclick = () => { showLobby = !showLobby; render(); };
+    $("#cClear").onclick = () => { if (st.q >= 0 && confirm(`Effacer toutes les réponses du QCM ${st.q + 1} ?`)) DB.remove(`${BASE}/votes/${st.q}`); };
+    $("#cReset").onclick = () => { if (confirm("Nouvelle séance : effacer étudiants, votes et progression ?")) DB.remove(BASE).then(() => DB.set(`${BASE}/state`, { q: -1, phase: "lobby", rev: "" })); };
+    $("#cLead").onclick = openLead;
+    $("#leadClose").onclick = () => $("#leadModal").classList.add("hidden");
+    addEventListener("keydown", e => {
+      if (e.target.tagName === "INPUT") return;
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); $("#cMain").click(); }
+      if (e.key === "ArrowLeft") $("#cPrev").click();
+      if (e.key === "Escape") $("#leadModal").classList.add("hidden");
+    });
+
+    function openLead() {
+      const rev = revealedList(st), rows = leaderboard(players, votes, rev);
+      $("#leadNote").textContent = `Calculé sur ${rev.length} QCM corrigé(s). Égalités départagées par le nombre de propositions bien jugées.`;
+      $("#fullLead").innerHTML = rows.length ? rows.map((r, i) => `<li><span class="rk">${i + 1}</span><span>${esc(r.name)}</span><b>${r.exact} · <small style="color:#9db0c7">${r.pts} pts</small></b></li>`).join("") : "<p class='muted'>Aucun participant.</p>";
+      $("#leadModal").classList.remove("hidden");
+    }
+
+    let barsFor = null;
+    function render() {
+      const np = Object.keys(players).length;
+      const lobby = showLobby || st.phase === "lobby" || st.q < 0;
+      $("#pLobby").classList.toggle("hidden", !lobby);
+      $("#pQuestion").classList.toggle("hidden", lobby);
+      $("#lobbyCount").textContent = np;
+      $("#lobbyNames").innerHTML = Object.values(players).map(p => `<span>${esc(p.p)}</span>`).join("");
+      const main = $("#cMain");
+      main.textContent = (st.phase === "lobby" || st.q < 0) ? "Lancer le QCM 1 →"
+        : st.phase === "vote" ? "✓ Valider et afficher la correction"
+        : st.phase === "reveal" ? (st.q < N - 1 ? `QCM ${st.q + 2} →` : "Terminer la séance 🏁")
+        : "Voir le classement final";
+      $("#cPrev").disabled = st.q <= 0;
+      $("#cReopen").classList.toggle("hidden", st.phase !== "reveal");
+      if (st.phase === "end" && !$("#leadModal").dataset.shown) { $("#leadModal").dataset.shown = 1; openLead(); }
+      if (st.phase !== "end") delete $("#leadModal").dataset.shown;
+      if (lobby) return;
+
+      const q = st.q, d = QCM[q], rev = st.phase === "reveal" || st.phase === "end";
+      const qv = Object.values(votes[q] || {}), nr = qv.length;
+      if (barsFor !== q) {
+        barsFor = q;
+        $("#pQnum").textContent = `QCM ${q + 1} / ${N}`;
+        $("#pQtheme").textContent = d.theme; $("#pQstem").textContent = d.stem; $("#pQctx").textContent = d.ctx;
+        $("#pBars").innerHTML = d.o.map((o, i) => `<div class="bar"><div class="fill"></div><div class="row"><span class="l">${L[i]}</span><span class="t">${esc(o[0])}</span><span class="pct">0 %<small>0 vote</small></span></div></div>`).join("");
+      }
+      $("#qdots").innerHTML = QCM.map((_, i) => `<i class="${i === q ? "cur" : revealedList(st).includes(i) ? "rev" : ""}">${i + 1}</i>`).join("");
+      const counts = [0, 0, 0, 0, 0];
+      qv.forEach(v => parseSel(v.s).forEach(i => counts[i]++));
+      $("#pQcard").classList.toggle("blind", $("#cBlind").checked && !rev);
+      [...$("#pBars").children].forEach((b, i) => {
+        const pct = nr ? Math.round(counts[i] / nr * 100) : 0, g = d.o[i][1] === 1;
+        b.querySelector(".fill").style.width = pct + "%";
+        b.querySelector(".pct").innerHTML = `${pct} %<small>${counts[i]} vote${counts[i] > 1 ? "s" : ""}</small>`;
+        b.className = "bar" + (rev ? (g ? " good" : " wrong") : "");
+        const l = b.querySelector(".l"); l.textContent = rev ? (g ? "✓" : "✕") : L[i];
+        let w = b.querySelector(".why");
+        if (rev && !w) { w = document.createElement("div"); w.className = "why"; w.innerHTML = `<em>${L[i]} — ${g ? "Vrai" : "Faux"} :</em> ${esc(d.o[i][2])}`; b.append(w); }
+        if (!rev && w) w.remove();
+      });
+      const exact = qv.filter(v => judge(q, parseSel(v.s)).exact).length;
+      $("#kExactCard").classList.toggle("hidden", !rev);
+      $("#kExact").textContent = (nr ? Math.round(exact / nr * 100) : 0) + " %";
+      $("#kResp").textContent = nr; $("#kPlayers").textContent = np;
+      const part = np ? Math.min(100, Math.round(nr / np * 100)) : 0;
+      $("#kPart").textContent = part + " %"; $("#kRing").style.width = part + "%";
+      const E = $("#pExpl");
+      if (rev) { E.innerHTML = `<div class="callout" style="margin-top:16px"><b>À retenir :</b> ${esc(d.key)}</div><div class="callout warn"><b>À débattre :</b> ${esc(d.debate)}</div><p class="muted" style="font-size:.85rem">Références : ${esc(d.refs)}</p>`; E.classList.remove("hidden"); }
+      else E.classList.add("hidden");
+      const rows = leaderboard(players, votes, revealedList(st)).slice(0, 5);
+      $("#miniLead").innerHTML = rows.length ? rows.map((r, i) => `<li><span class="rk">${i + 1}</span><span>${esc(r.name)}</span><b>${r.exact}</b></li>`).join("") : "<p class='muted'>—</p>";
+    }
+  }
+}
+
+/* ---------- Démarrage ---------- */
+initDB().then(() => isProf ? prof() : student()).catch(e => fail("Impossible de charger Firebase : vérifiez la connexion Internet et la configuration. (" + e.message + ")"));
+})();
+</script>
+</body>
+</html>
